@@ -1,0 +1,14 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Análise de Avaliações</title>
+</head>
+<body>
+    <h1>Análise de Avaliações</h1>
+    <form method="post" action="{{ url_for('index') }}">
+        <label for="url_produto">URL do Produto na Amazon:</label><br>
+        <input type="text" id="url_produto" name="url_produto"><br><br>
+        <input type="submit" value="Analisar">
+    </form>
+</body>
+</html>
