@@ -2,17 +2,19 @@
 <html>
 <head>
     <title>Resultado da Análise</title>
+    <link rel="stylesheet" href="../static/result.css">
+    <link rel="stylesheet" href="../static/reset.css">
 </head>
 <body>
-    <h1>Resultado da Análise</h1>
-    {% if translations %}
+    <h1 class="page-title">Resultado da Análise</h1>
+    <!-- {% if translations %}
         <h2>Comentários traduzidos:</h2>
         <ul>
         {% for translation in translations %}
             <li>{{ translation }}</li>
         {% endfor %}
         </ul>
-    {% endif %}
+    {% endif %} -->
     {% if avaliacoes %}
         <h2>Comentários originais:</h2>
         <ul>
