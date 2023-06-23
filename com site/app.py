@@ -58,7 +58,7 @@ def analisar_avaliacoes(url_produto):
         total_avaliacoes = len(avaliacoes)
         positivo_percent = format(percentage(positivo, total_avaliacoes), '.2f')
         negativo_percent = format(percentage(negativo, total_avaliacoes), '.2f')
-        neutro_percent = format(percentage(neutro, total_avaliacoes), '.2f')       
+        neutro_percent = format(percentage(neutro, total_avaliacoes), '.2f')
 
 
         labels = ['Positivo [' + str(positivo_percent) + '%]', 'Neutro [' + str(neutro_percent) + '%]', 'Negativo [' + str(negativo_percent) + '%]']
@@ -72,17 +72,20 @@ def analisar_avaliacoes(url_produto):
         plt.savefig('D:/IA-AvaliacaoProdutos/com site/static/grafico.png')
         plt.close()
 
-        return translations, avaliacoes
+        most_positive = avaliacoes[sentimentos.index(max(sentimentos))]
+        most_negative = avaliacoes[sentimentos.index(min(sentimentos))]
+
+        return translations, avaliacoes, most_positive, most_negative
     else:
-        return [], []
+        return [], [], '', ''
 
 
 @app.route('/', methods=['GET', 'POST'])
 def index():
     if request.method == 'POST':
         url_produto = request.form['url_produto']
-        translations, avaliacoes = analisar_avaliacoes(url_produto)
-        return render_template('result.html', translations=translations, avaliacoes=avaliacoes)
+        translations, avaliacoes, most_positive, most_negative = analisar_avaliacoes(url_produto)
+        return render_template('result.html', translations=translations, avaliacoes=avaliacoes, most_positive=most_positive, most_negative=most_negative)
     return render_template('index.html')
 
 
