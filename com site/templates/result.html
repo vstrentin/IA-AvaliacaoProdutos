@@ -1,27 +1,45 @@
 <!DOCTYPE html>
 <html>
+
 <head>
     <title>Resultado da Análise</title>
+    <link rel="stylesheet" href="../static/result.css">
+    <link rel="stylesheet" href="../static/reset.css">
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@100;300&display=swap" rel="stylesheet">
 </head>
+
 <body>
-    <h1>Resultado da Análise</h1>
-    {% if translations %}
+    <h1 class="page-title">Resultado da Análise</h1>
+    <!-- {% if translations %}
         <h2>Comentários traduzidos:</h2>
         <ul>
         {% for translation in translations %}
             <li>{{ translation }}</li>
         {% endfor %}
         </ul>
-    {% endif %}
+    {% endif %} -->
     {% if avaliacoes %}
-        <h2>Comentários originais:</h2>
-        <ul>
+    <h2 class="comms-title">Comentários originais:</h2>
+    <ul class="comms-list">
         {% for avaliacao in avaliacoes %}
-            <li>{{ avaliacao }}</li>
+        <li class="comms-box">{{ avaliacao }}</li>
         {% endfor %}
-        </ul>
+    </ul>
+
+    <div class="most-positive">
+        <h3>Comentário mais positivo:</h3>
+        <p>{{ most_positive }}</p>
+    </div>
+
+    <div class="most-negative">
+        <h3>Comentário mais negativo:</h3>
+        <p>{{ most_negative }}</p>
+    </div>
+
     {% endif %}
-    <h2>Gráfico de Sentimento:</h2>
+    <h2 class="comms-title">Gráfico de Sentimento:</h2>
     <img src="{{ url_for('static', filename='grafico.png') }}" alt="Gráfico de Sentimento">
 </body>
+
+
 </html>

@@ -6,35 +6,45 @@ matplotlib.use('agg')
 from googletrans import Translator
 import requests
 from bs4 import BeautifulSoup
+import time
 
 app = Flask(__name__)
+retry_count = 0
 
 def percentage(parte, total):
     return 100 * float(parte) / float(total)
 
 def extrair_avaliacoes_amazon(url):
-    # Faz a solicitação HTTP para a página do produto na Amazon
+    global retry_count  # Adiciona a declaração global para modificar a variável retry_count dentro da função
     response = requests.get(url)
 
-    # Verifica se a solicitação foi bem-sucedida
     if response.status_code == 200:
-        # Analisa o HTML da página usando BeautifulSoup
+        print('Solicitação bem-sucedida')
         soup = BeautifulSoup(response.content, 'html.parser')
-
-        # Encontra todos os elementos de avaliação na página
         avaliacoes = soup.find_all('div', {'data-hook': 'review'})
-
-        # Extrai o texto completo de cada avaliação
         avaliacoes_completas = []
         for avaliacao in avaliacoes:
             texto_avaliacao = avaliacao.find('span', {'data-hook': 'review-body'}).text
             avaliacoes_completas.append(texto_avaliacao)
-
-        # Retorna as avaliações completas como uma lista
         return avaliacoes_completas
+    
+    elif response.status_code == 503:
+        max_retries = 5  # Número máximo de tentativas
+        retry_delay = 5  # Tempo de espera entre as tentativas (em segundos)
 
+        if retry_count < max_retries:
+            retry_count += 1
+            print('Serviço indisponível, tentando novamente em', retry_delay, 'segundos...')
+            print(retry_count)
+            time.sleep(retry_delay)
+            return extrair_avaliacoes_amazon(url)
+        else:
+            print('Limite máximo de tentativas atingido. Não foi possível extrair as avaliações.')
+            retry_count = 0  # Reinicia a variável retry_count para zero após atingir o limite máximo de tentativas
+            return []
+    
     else:
-        print('Não foi possível acessar a página do produto.')
+        print('Solicitação mal-sucedida. Código de status:', response.status_code)
         return []
 
 def analisar_avaliacoes(url_produto):
@@ -58,8 +68,7 @@ def analisar_avaliacoes(url_produto):
         total_avaliacoes = len(avaliacoes)
         positivo_percent = format(percentage(positivo, total_avaliacoes), '.2f')
         negativo_percent = format(percentage(negativo, total_avaliacoes), '.2f')
-        neutro_percent = format(percentage(neutro, total_avaliacoes), '.2f')       
-
+        neutro_percent = format(percentage(neutro, total_avaliacoes), '.2f')
 
         labels = ['Positivo [' + str(positivo_percent) + '%]', 'Neutro [' + str(neutro_percent) + '%]', 'Negativo [' + str(negativo_percent) + '%]']
         sizes = [positivo_percent, neutro_percent, negativo_percent]
@@ -69,20 +78,23 @@ def analisar_avaliacoes(url_produto):
         plt.legend(patches, labels, loc="best")
         plt.axis('equal')
         plt.tight_layout()
-        plt.savefig('D:/IA-AvaliacaoProdutos/com site/static/grafico.png')
+        plt.savefig('C:\\Users\\Eduar\\OneDrive\\Documentos\\Projetos\\Faculdade\\IA-AvaliacaoProdutos\\com site\\static\\grafico.png')
         plt.close()
 
-        return translations, avaliacoes
+        most_positive = avaliacoes[sentimentos.index(max(sentimentos))]
+        most_negative = avaliacoes[sentimentos.index(min(sentimentos))]
+
+        return translations, avaliacoes, most_positive, most_negative
     else:
-        return [], []
+        return [], [], '', ''
 
 
 @app.route('/', methods=['GET', 'POST'])
 def index():
     if request.method == 'POST':
         url_produto = request.form['url_produto']
-        translations, avaliacoes = analisar_avaliacoes(url_produto)
-        return render_template('result.html', translations=translations, avaliacoes=avaliacoes)
+        translations, avaliacoes, most_positive, most_negative = analisar_avaliacoes(url_produto)
+        return render_template('result.html', translations=translations, avaliacoes=avaliacoes, most_positive=most_positive, most_negative=most_negative)
     return render_template('index.html')
 
 

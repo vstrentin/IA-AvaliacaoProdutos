@@ -1,14 +1,37 @@
 <!DOCTYPE html>
 <html>
+
 <head>
     <title>Análise de Avaliações</title>
+    <link rel="stylesheet" href="../static/styles.css">
+    <link rel="stylesheet" href="../static/reset.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@100;300&display=swap" rel="stylesheet">
+    <script>
+        function addFocusStyle() {
+            var button = document.getElementById('search-button');
+            button.classList.add('button-focus');
+            console.log('teste')
+        }
+
+        function removeFocusStyle() {
+            var button = document.getElementById('search-button');
+            button.classList.remove('button-focus');
+        }
+    </script>
 </head>
+
 <body>
-    <h1>Análise de Avaliações</h1>
     <form method="post" action="{{ url_for('index') }}">
-        <label for="url_produto">URL do Produto na Amazon:</label><br>
-        <input type="text" id="url_produto" name="url_produto"><br><br>
-        <input type="submit" value="Analisar">
+        <h1 class="page-title">Análise de Avaliações</h1>
+        <div class="input-wrapper">
+            <input type="text" id="url_produto" name="url_produto" class="search-box"
+                placeholder="URL do Produto na Amazon" onfocus="addFocusStyle()"
+                onblur="removeFocusStyle()"><br><br><br><br>
+            <button type="submit" id="search-button"><i class="fa fa-search"></i></button>
+        </div>
+
     </form>
 </body>
+
 </html>
